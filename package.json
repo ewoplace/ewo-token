@@ -4,11 +4,13 @@
   "description": "OWE token",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "flatten": "node_modules/.bin/truffle-flattener",
+    "flatowe": "npm run flatten ./contracts/OWEToken.sol > ./output/OWEToken.sol && cat ./output/OWEToken.sol | pbcopy"
   },
   "author": "Nigel",
   "license": "ISC",
-  "dependencies": {
-    "openzeppelin-solidity": "1.9.0"
+  "devDependencies": {
+    "openzeppelin-solidity": "1.9.0",
+    "truffle-flattener": "^1.2.5"
   }
 }
