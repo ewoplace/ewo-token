@@ -1,4 +1,4 @@
-pragma solidity 0.4.21;
+pragma solidity 0.4.23;
 
 // File: openzeppelin-solidity/contracts/ownership/Ownable.sol
 
@@ -184,52 +184,6 @@ contract HasNoTokens is CanReclaimToken {
     revert();
   }
 
-}
-
-// File: openzeppelin-solidity/contracts/lifecycle/Pausable.sol
-
-/**
- * @title Pausable
- * @dev Base contract which allows children to implement an emergency stop mechanism.
- */
-contract Pausable is Ownable {
-  event Pause();
-  event Unpause();
-
-  bool public paused = false;
-
-
-  /**
-   * @dev Modifier to make a function callable only when the contract is not paused.
-   */
-  modifier whenNotPaused() {
-    require(!paused);
-    _;
-  }
-
-  /**
-   * @dev Modifier to make a function callable only when the contract is paused.
-   */
-  modifier whenPaused() {
-    require(paused);
-    _;
-  }
-
-  /**
-   * @dev called by the owner to pause, triggers stopped state
-   */
-  function pause() onlyOwner whenNotPaused public {
-    paused = true;
-    emit Pause();
-  }
-
-  /**
-   * @dev called by the owner to unpause, returns to normal state
-   */
-  function unpause() onlyOwner whenPaused public {
-    paused = false;
-    emit Unpause();
-  }
 }
 
 // File: openzeppelin-solidity/contracts/math/SafeMath.sol
@@ -423,6 +377,97 @@ contract StandardToken is ERC20, BasicToken {
 
 }
 
+// File: openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol
+
+/**
+ * @title Mintable token
+ * @dev Simple ERC20 Token example, with mintable token creation
+ * @dev Issue: * https://github.com/OpenZeppelin/openzeppelin-solidity/issues/120
+ * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
+ */
+contract MintableToken is StandardToken, Ownable {
+  event Mint(address indexed to, uint256 amount);
+  event MintFinished();
+
+  bool public mintingFinished = false;
+
+
+  modifier canMint() {
+    require(!mintingFinished);
+    _;
+  }
+
+  /**
+   * @dev Function to mint tokens
+   * @param _to The address that will receive the minted tokens.
+   * @param _amount The amount of tokens to mint.
+   * @return A boolean that indicates if the operation was successful.
+   */
+  function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
+    totalSupply_ = totalSupply_.add(_amount);
+    balances[_to] = balances[_to].add(_amount);
+    emit Mint(_to, _amount);
+    emit Transfer(address(0), _to, _amount);
+    return true;
+  }
+
+  /**
+   * @dev Function to stop minting new tokens.
+   * @return True if the operation was successful.
+   */
+  function finishMinting() onlyOwner canMint public returns (bool) {
+    mintingFinished = true;
+    emit MintFinished();
+    return true;
+  }
+}
+
+// File: openzeppelin-solidity/contracts/lifecycle/Pausable.sol
+
+/**
+ * @title Pausable
+ * @dev Base contract which allows children to implement an emergency stop mechanism.
+ */
+contract Pausable is Ownable {
+  event Pause();
+  event Unpause();
+
+  bool public paused = false;
+
+
+  /**
+   * @dev Modifier to make a function callable only when the contract is not paused.
+   */
+  modifier whenNotPaused() {
+    require(!paused);
+    _;
+  }
+
+  /**
+   * @dev Modifier to make a function callable only when the contract is paused.
+   */
+  modifier whenPaused() {
+    require(paused);
+    _;
+  }
+
+  /**
+   * @dev called by the owner to pause, triggers stopped state
+   */
+  function pause() onlyOwner whenNotPaused public {
+    paused = true;
+    emit Pause();
+  }
+
+  /**
+   * @dev called by the owner to unpause, returns to normal state
+   */
+  function unpause() onlyOwner whenPaused public {
+    paused = false;
+    emit Unpause();
+  }
+}
+
 // File: openzeppelin-solidity/contracts/token/ERC20/PausableToken.sol
 
 /**
@@ -454,13 +499,13 @@ contract PausableToken is StandardToken, Pausable {
 
 // File: contracts/OWEToken.sol
 
-contract OWEToken is PausableToken, HasNoEther, HasNoTokens {
+contract OWEToken is MintableToken, PausableToken, HasNoEther, HasNoTokens {
 
   string public constant name = "OWE Token";
   string public constant symbol = "OWE";
   uint8 public constant decimals = 18;
 
-  uint256 private constant ONE_TOKEN = (10 ** uint256(decimals));
-  uint256 private constant MILLION_TOKENS = (10**6) * ONE_TOKEN;
-  uint256 private constant TOTAL_TOKENS = 250 * MILLION_TOKENS;
+  function finishMinting() onlyOwner canMint public returns (bool) {
+    return false;
+  }
 }
