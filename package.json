@@ -1,0 +1,14 @@
+{
+  "name": "owe",
+  "version": "1.0.0",
+  "description": "OWE token",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nigel",
+  "license": "ISC",
+  "dependencies": {
+    "openzeppelin-solidity": "1.9.0"
+  }
+}
