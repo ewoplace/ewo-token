@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "flatten": "node_modules/.bin/truffle-flattener",
-    "flatowe": "npm run flatten ./contracts/OWEToken.sol > ./output/OWEToken.sol && cat ./output/OWEToken.sol | pbcopy"
+    "flatewo": "npm run flatten ./contracts/EWOToken.sol > ./output/EWOToken.sol && cat ./output/EWOToken.sol | pbcopy"
   },
   "author": "Nigel",
   "license": "ISC",

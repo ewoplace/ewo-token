@@ -497,15 +497,11 @@ contract PausableToken is StandardToken, Pausable {
   }
 }
 
-// File: contracts/OWEToken.sol
+// File: contracts/EWOToken.sol
 
-contract OWEToken is MintableToken, PausableToken, HasNoEther, HasNoTokens {
+contract EWOToken is MintableToken, PausableToken, HasNoEther, HasNoTokens {
 
-  string public constant name = "OWE Token";
-  string public constant symbol = "OWE";
+  string public constant name = "EWO Token";
+  string public constant symbol = "EWO";
   uint8 public constant decimals = 18;
-
-  function finishMinting() onlyOwner canMint public returns (bool) {
-    return false;
-  }
 }
